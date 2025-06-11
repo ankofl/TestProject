@@ -3,7 +3,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using static UnityEngine.GraphicsBuffer;
+using UnityEngine;
+using Unity.Physics;
 
 partial struct DroneMoveSystem : ISystem
 {
@@ -24,8 +25,6 @@ partial struct DroneMoveSystem : ISystem
     {
         var ecb = new EntityCommandBuffer(Allocator.Temp);
 
-        NativeHashSet<Entity> pathedOres = new (0, Allocator.Temp);
-
         if(homeLeft.Equals(float3.zero) || homeRight.Equals(float3.zero))
         {
 			foreach (var (home, team, tran) in SystemAPI.Query<RefRO<Home>, RefRO<Team>, RefRO<LocalTransform>>())
@@ -41,13 +40,15 @@ partial struct DroneMoveSystem : ISystem
 			}
 		}
 
-        foreach (var (drone, droneTran) in SystemAPI.Query<RefRO<Drone>, RefRO<LocalTransform>>().WithNone<DroneToOre, DroneToHome>())
+		NativeHashSet<Entity> pathedOres = new(0, Allocator.Temp);
+
+		foreach (var (drone, droneTran) in SystemAPI.Query<RefRO<Drone>, RefRO<LocalTransform>>().WithNone<DroneToOre, DroneToHome>())
         {
             float minDist = 1000;
             Entity closestOre = Entity.Null;
             float3 targetPos = float3.zero;
 
-            foreach (var (ore, oreTran) in SystemAPI.Query<RefRO<Ore>, RefRO<LocalTransform>>())
+            foreach (var (ore, oreTran) in SystemAPI.Query<RefRO<Ore>, RefRO<LocalTransform>>().WithNone<OreToDrone>())
             {
                 if (!pathedOres.Contains(ore.ValueRO.Entity))
                 {
@@ -66,25 +67,35 @@ partial struct DroneMoveSystem : ISystem
             {
 				pathedOres.Add(closestOre);
 
+                ecb.AddComponent(closestOre, new OreToDrone
+                {
+                    Drone = drone.ValueRO.Entity,
+				});
+
 				ecb.AddComponent(drone.ValueRO.Entity, new DroneToOre
                 {
+                    Ore = closestOre,
                     Target = targetPos,
                 });
             }
         }
 
-        foreach (var (drone, team, tran, target) in 
-            SystemAPI.Query<RefRO<Drone>, RefRO<Team>, RefRW<LocalTransform>, RefRO<DroneToOre>>().WithNone<DroneToHome>())
+        foreach (var (drone, team, tran, target, velocity) in 
+            SystemAPI.Query<RefRO<Drone>, RefRO<Team>, RefRW<LocalTransform>, RefRO<DroneToOre>, RefRW<PhysicsVelocity>>()
+            .WithNone<DroneToHome>())
         {
             var dist = math.distance(tran.ValueRO.Position, target.ValueRO.Target);
-            if(dist > 0.3f)
+            if(dist > 1.3f)
 			{
 				var dir = math.normalize(target.ValueRO.Target - tran.ValueRO.Position);
 
-				tran.ValueRW.Position = tran.ValueRO.Position + drone.ValueRO.Speed * SystemAPI.Time.DeltaTime * dir;
+				velocity.ValueRW.Linear = math.clamp(velocity.ValueRO.Linear + drone.ValueRO.Speed * SystemAPI.Time.DeltaTime * dir,
+                    new float3(-3), new float3(3));
 			}
             else
             {
+                ecb.RemoveComponent<OreToDrone>(SystemAPI.GetComponent<DroneToOre>(drone.ValueRO.Entity).Ore);
+
                 ecb.RemoveComponent<DroneToOre>(drone.ValueRO.Entity);
                 
                 if(team.ValueRO.CurrentTeam == Teams.Left)
@@ -104,16 +115,18 @@ partial struct DroneMoveSystem : ISystem
 			}
         }
 
-        foreach (var (drone, tran, toHome) in 
-            SystemAPI.Query<RefRO<Drone>, RefRW<LocalTransform>, RefRO<DroneToHome>>().WithNone<DroneToOre>())
+        foreach (var (drone, tran, toHome, velocity) in 
+            SystemAPI.Query<RefRO<Drone>, RefRW<LocalTransform>, RefRO<DroneToHome>, RefRW<PhysicsVelocity>>()
+            .WithNone<DroneToOre>())
         {
             var dist = math.distance(tran.ValueRO.Position, toHome.ValueRO.HomePos);
 
-            if(dist > 0.3f)
+            if(dist > 3.5f)
             {
 				var dir = math.normalize(toHome.ValueRO.HomePos - tran.ValueRO.Position);
 
-				tran.ValueRW.Position = tran.ValueRO.Position + drone.ValueRO.Speed * SystemAPI.Time.DeltaTime * dir;
+				velocity.ValueRW.Linear = math.clamp(velocity.ValueRO.Linear + drone.ValueRO.Speed * SystemAPI.Time.DeltaTime * dir,
+					new float3(-3), new float3(3));
 			}
             else
             {
@@ -125,6 +138,11 @@ partial struct DroneMoveSystem : ISystem
     }
 }
 
+public struct OreToDrone : IComponentData
+{
+    public Entity Drone;
+}
+
 public struct DroneToHome : IComponentData
 {
     public float3 HomePos;
@@ -132,5 +150,7 @@ public struct DroneToHome : IComponentData
 
 public struct DroneToOre : IComponentData
 {
-    public float3 Target;
+    public Entity Ore;
+
+	public float3 Target;
 }

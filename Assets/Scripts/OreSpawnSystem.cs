@@ -35,7 +35,7 @@ partial struct OreSpawnSystem : ISystem
 		for (int i = 0, c = 0; i < oresCount && c < oresCount * 10; c++)
 		{
 
-			var pos = rnd.NextFloat3(new(-10, 0, -10), new(10, 0, 10));
+			var pos = rnd.NextFloat3(new(-10, -1f, -10), new(10, -1f, 10));
 
 			float closest = 10;
 			foreach (var item in spawnedPos)
@@ -55,7 +55,7 @@ partial struct OreSpawnSystem : ISystem
 				spawnedPos.Add(pos);
 
 				var ore = ecb.Instantiate(prefabs.Ore);
-				ecb.SetComponent(ore, LocalTransform.FromPosition(pos));
+				ecb.SetComponent(ore, LocalTransform.FromPositionRotation(pos, quaternion.Euler(math.radians(35), 0, math.radians(45))));
 			}
 		}
 

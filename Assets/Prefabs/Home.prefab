@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cde3b912cf40736489e694263f558c92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DronesCount: 1
+  DronesCount: 15
 --- !u!114 &2285251357711807061
 MonoBehaviour:
   m_ObjectHideFlags: 0

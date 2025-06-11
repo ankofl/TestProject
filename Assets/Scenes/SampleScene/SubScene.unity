@@ -242,7 +242,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 399000701875583959, guid: 4530c15ea574670409514660d956ed81, type: 3}
       propertyPath: m_Name
-      value: Base (1)
+      value: HomeRight
       objectReference: {fileID: 0}
     - target: {fileID: 2285251357711807061, guid: 4530c15ea574670409514660d956ed81, type: 3}
       propertyPath: Team
@@ -319,7 +319,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 399000701875583959, guid: 4530c15ea574670409514660d956ed81, type: 3}
       propertyPath: m_Name
-      value: Base
+      value: HomeLeft
       objectReference: {fileID: 0}
     - target: {fileID: 2285251357711807061, guid: 4530c15ea574670409514660d956ed81, type: 3}
       propertyPath: Team

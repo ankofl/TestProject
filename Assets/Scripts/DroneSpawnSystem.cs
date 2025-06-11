@@ -41,7 +41,7 @@ partial struct DroneSpawnSystem : ISystem
 
 				var drone = ecb.Instantiate(prefabs.Drone);
 				ecb.SetComponent(drone, LocalTransform.FromPosition(droneSpawnPoint));
-				ecb.SetComponent(drone, new DroneToBufferRequest { Team = team.ValueRO.CurrentTeam });
+				ecb.SetComponent(drone, new Team { CurrentTeam = team.ValueRO.CurrentTeam });
 				ecb.SetComponent(drone, new URPMaterialPropertyBaseColor { Value = color.ValueRO.Value });
 			}
 

@@ -1075,6 +1075,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.2D.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Physics.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Physics.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.InputSystem.ForUI">
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.ForUI.dll</HintPath>
       <Private>False</Private>
@@ -1179,6 +1183,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.Rendering.LightTransport.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Physics">
+      <HintPath>Library\ScriptAssemblies\Unity.Physics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.Core">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
       <Private>False</Private>
@@ -1201,6 +1209,10 @@
     </Reference>
     <Reference Include="Unity.Collections.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Collections.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Physics.Hybrid">
+      <HintPath>Library\ScriptAssemblies\Unity.Physics.Hybrid.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Profiling.Core">

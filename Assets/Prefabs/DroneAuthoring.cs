@@ -15,11 +15,6 @@ class DroneAuthoring : MonoBehaviour
 				Speed = authoring.Speed,
 				Entity = drone,
 			});
-
-			AddComponent(drone, new DroneToBufferRequest
-			{
-				Team = Teams.None,
-			});
 		}
 	}
 }
@@ -28,11 +23,6 @@ public struct Drone : IComponentData
 {
 	public float Speed;
 	public Entity Entity;
-}
-
-public struct DroneToBufferRequest : IComponentData
-{
-	public Teams Team;
 }
 
 
