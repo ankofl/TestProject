@@ -31,7 +31,7 @@ partial struct DroneSpawnSystem : ISystem
         {
             for (int i = 0; i < droneRequest.ValueRO.DronesCount; i++)
             {
-                var deltaX = 2;
+                var deltaX = 4;
 				if (tran.ValueRO.Position.x > 0)
 				{
                     deltaX = -deltaX;
