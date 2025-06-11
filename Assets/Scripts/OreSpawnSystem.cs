@@ -13,7 +13,7 @@ partial struct OreSpawnSystem : ISystem
 
 		state.RequireForUpdate<OreSpawnRequest>();
 
-		state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new OreSpawnRequest { OresCount = 10 });
+		state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new OreSpawnRequest { OresCount = 30 });
 
 		rnd = new();
 		rnd.InitState();
@@ -48,7 +48,7 @@ partial struct OreSpawnSystem : ISystem
 			}
 
 
-			if (closest > 3)
+			if (closest > 2)
 			{
 				i++;
 
