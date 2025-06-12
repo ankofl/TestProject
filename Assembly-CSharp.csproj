@@ -76,6 +76,7 @@
     <Compile Include="Assets\Prefabs\PrefabsAuthoring.cs" />
     <Compile Include="Assets\Scripts\DroneMoveSystem.cs" />
     <Compile Include="Assets\Prefabs\HomeAuthoring.cs" />
+    <Compile Include="Assets\Scripts\DroneMoveDisableSystem.cs" />
     <Compile Include="Assets\Prefabs\OreAuthoring.cs" />
     <Compile Include="Assets\Scripts\DroneSpawnSystem.cs" />
     <Compile Include="Assets\Prefabs\DroneAuthoring.cs" />
@@ -1207,12 +1208,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.Entities.Hybrid.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Collections.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Collections.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.Physics.Hybrid">
       <HintPath>Library\ScriptAssemblies\Unity.Physics.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Collections.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Profiling.Core">

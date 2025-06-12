@@ -27,25 +27,44 @@ partial struct DroneSpawnSystem : ISystem
         var prefabs = SystemAPI.GetSingleton<Prefabs>();
 
         foreach (var (home, team, tran, droneRequest, color) in 
-            SystemAPI.Query<RefRW<Home>, RefRO<Team>, RefRO<LocalTransform>, RefRO<HomeDronesRequest>, RefRO<URPMaterialPropertyBaseColor>>())
+            SystemAPI.Query<RefRW<Home>, RefRO<Team>, RefRO<LocalTransform>, RefRW<HomeDronesRequest>, RefRO<URPMaterialPropertyBaseColor>>())
         {
-            for (int i = 0; i < droneRequest.ValueRO.DronesCount; i++)
+            if(droneRequest.ValueRO.TimeToNextWave > 0)
             {
-                var deltaX = 4;
-				if (tran.ValueRO.Position.x > 0)
-				{
-                    deltaX = -deltaX;
+                droneRequest.ValueRW.TimeToNextWave -= SystemAPI.Time.DeltaTime;
+            }
+            else
+            {
+                droneRequest.ValueRW.TimeToNextWave = 0.2f;
+
+				var portion = 10;
+                if(droneRequest.ValueRO.DronesRemainedCount <= portion)
+                {
+                    portion = droneRequest.ValueRO.DronesRemainedCount;
+					ecb.RemoveComponent<HomeDronesRequest>(home.ValueRO.Entity);
 				}
-				var droneSpawnPoint = tran.ValueRO.Position + new float3(deltaX, 0, (i + 0.5f) * 2f - (droneRequest.ValueRO.DronesCount));
-                
+                else
+                {
+                    droneRequest.ValueRW.DronesRemainedCount -= portion;
+				}
 
-				var drone = ecb.Instantiate(prefabs.Drone);
-				ecb.SetComponent(drone, LocalTransform.FromPosition(droneSpawnPoint));
-				ecb.SetComponent(drone, new Team { CurrentTeam = team.ValueRO.CurrentTeam });
-				ecb.SetComponent(drone, new URPMaterialPropertyBaseColor { Value = color.ValueRO.Value });
+				for (int i = 0; i < portion; i++)
+				{
+					var deltaX = 4;
+					if (tran.ValueRO.Position.x > 0)
+					{
+						deltaX = -deltaX;
+					}
+					var droneSpawnPoint = tran.ValueRO.Position +
+						new float3(deltaX, 0, (i + 0.5f) * 2f - portion);
+
+
+					var drone = ecb.Instantiate(prefabs.Drone);
+					ecb.SetComponent(drone, LocalTransform.FromPosition(droneSpawnPoint));
+					ecb.SetComponent(drone, new Team { CurrentTeam = team.ValueRO.CurrentTeam });
+					ecb.SetComponent(drone, new URPMaterialPropertyBaseColor { Value = color.ValueRO.Value });
+				}
 			}
-
-			ecb.RemoveComponent<HomeDronesRequest>(home.ValueRO.Entity);
         }
 
         ecb.Playback(state.EntityManager);

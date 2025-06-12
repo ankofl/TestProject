@@ -2,9 +2,11 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
-using UnityEngine;
 using Unity.Physics;
+using Unity.Transforms;
+using Unity.VisualScripting;
+using Unity.VisualScripting.Dependencies.Sqlite;
+using UnityEngine;
 
 partial struct DroneMoveSystem : ISystem
 {
@@ -15,15 +17,22 @@ partial struct DroneMoveSystem : ISystem
         state.RequireForUpdate<Drone>();
         state.RequireForUpdate<Ore>();
 
+
         homeLeft = float3.zero;
         homeRight = float3.zero;
+
+        TranLookup = SystemAPI.GetComponentLookup<LocalTransform>();
 	}
     float3 homeLeft, homeRight;
+    ComponentLookup<LocalTransform> TranLookup;
+
 
 	[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var ecb = new EntityCommandBuffer(Allocator.Temp);
+
+        TranLookup.Update(ref state);
 
         if(homeLeft.Equals(float3.zero) || homeRight.Equals(float3.zero))
         {
@@ -40,39 +49,70 @@ partial struct DroneMoveSystem : ISystem
 			}
 		}
 
-		NativeHashSet<Entity> pathedOres = new(0, Allocator.Temp);
+		NativeHashSet<Entity> pathedOresLeft = new(0, Allocator.Temp);
+		NativeHashSet<Entity> pathedOresRight = new(0, Allocator.Temp);
 
-		foreach (var (drone, droneTran) in SystemAPI.Query<RefRO<Drone>, RefRO<LocalTransform>>().WithNone<DroneToOre, DroneToHome>())
+		foreach (var (droneFree, droneTran) in SystemAPI.Query<RefRO<Drone>, RefRO<LocalTransform>>()
+            .WithNone<DroneToOre, DroneToHome>())
         {
-            float minDist = 1000;
+            var droneTeam = SystemAPI.GetComponent<Team>(droneFree.ValueRO.Entity).CurrentTeam;
+
+			float minDist = 1000;
             Entity closestOre = Entity.Null;
             float3 targetPos = float3.zero;
 
-            foreach (var (ore, oreTran) in SystemAPI.Query<RefRO<Ore>, RefRO<LocalTransform>>().WithNone<OreToDrone>())
+            var oresFiltered = new NativeList<Entity>(Allocator.Temp);
+            if(droneTeam == Teams.Left)
             {
-                if (!pathedOres.Contains(ore.ValueRO.Entity))
-                {
-                    var curDist = math.distance(droneTran.ValueRO.Position, oreTran.ValueRO.Position);
-                    if(curDist < minDist)
-                    {
-                        minDist = curDist;
-                        closestOre = ore.ValueRO.Entity;
+				foreach (var (ore, oreTran) in SystemAPI.Query<RefRO<Ore>, RefRO<LocalTransform>>().WithNone<OreToTeamLeft>())
+				{
+					if (!pathedOresLeft.Contains(ore.ValueRO.Entity))
+					{
+                        oresFiltered.Add(ore.ValueRO.Entity);
+					}
+				}
+			}
+            else if (droneTeam == Teams.Right)
+            {
+				foreach (var (ore, oreTran) in SystemAPI.Query<RefRO<Ore>, RefRO<LocalTransform>>().WithNone<OreToTeamRight>())
+				{
+					if (!pathedOresRight.Contains(ore.ValueRO.Entity))
+					{
+						oresFiltered.Add(ore.ValueRO.Entity);
+					}
+				}
+			}
 
-                        targetPos = oreTran.ValueRO.Position;
-                    }
+
+            foreach (var oreFiltered in oresFiltered)
+            {
+                var pos = TranLookup.GetRefRO(oreFiltered).ValueRO.Position;
+
+                var curDist = math.distance(droneTran.ValueRO.Position, pos);
+                if (curDist < minDist)
+                {
+                    minDist = curDist;
+                    closestOre = oreFiltered;
+
+                    targetPos = pos;
                 }
             }
 
             if(closestOre != Entity.Null)
             {
-				pathedOres.Add(closestOre);
+				pathedOresLeft.Add(closestOre);
 
-                ecb.AddComponent(closestOre, new OreToDrone
+
+                if (droneTeam == Teams.Left)
                 {
-                    Drone = drone.ValueRO.Entity,
-				});
+                    ecb.AddComponent(closestOre, new OreToTeamLeft { });
+				}
+				else if (droneTeam == Teams.Right)
+				{
+					ecb.AddComponent(closestOre, new OreToTeamRight { });
+				}
 
-				ecb.AddComponent(drone.ValueRO.Entity, new DroneToOre
+				ecb.AddComponent(droneFree.ValueRO.Entity, new DroneToOre
                 {
                     Ore = closestOre,
                     Target = targetPos,
@@ -82,24 +122,31 @@ partial struct DroneMoveSystem : ISystem
 
         foreach (var (drone, team, tran, target, velocity) in 
             SystemAPI.Query<RefRO<Drone>, RefRO<Team>, RefRW<LocalTransform>, RefRO<DroneToOre>, RefRW<PhysicsVelocity>>()
-            .WithNone<DroneToHome>())
+            .WithNone<DroneToHome>().WithNone<DroneMoveDisable>())
         {
             var dist = math.distance(tran.ValueRO.Position, target.ValueRO.Target);
             if(dist > 1.3f)
 			{
+                var maxSpeed = drone.ValueRO.MaxSpeed;
+                if(dist < 3)
+                {
+                    maxSpeed = 1f;
+                }
+
+
 				var dir = math.normalize(target.ValueRO.Target - tran.ValueRO.Position);
 
-				velocity.ValueRW.Linear = math.clamp(velocity.ValueRO.Linear + drone.ValueRO.Speed * SystemAPI.Time.DeltaTime * dir,
-                    new float3(-3), new float3(3));
+				velocity.ValueRW.Linear = math.clamp(dir * drone.ValueRO.Speed,
+					-maxSpeed, maxSpeed);
 			}
             else
             {
-                ecb.RemoveComponent<OreToDrone>(SystemAPI.GetComponent<DroneToOre>(drone.ValueRO.Entity).Ore);
+                var ore = SystemAPI.GetComponent<DroneToOre>(drone.ValueRO.Entity).Ore;
 
-                ecb.RemoveComponent<DroneToOre>(drone.ValueRO.Entity);
-                
-                if(team.ValueRO.CurrentTeam == Teams.Left)
+				if (team.ValueRO.CurrentTeam == Teams.Left)
                 {
+					ecb.RemoveComponent<OreToTeamLeft>(ore);
+
 					ecb.AddComponent(drone.ValueRO.Entity, new DroneToHome
 					{
 						HomePos = homeLeft,
@@ -107,11 +154,15 @@ partial struct DroneMoveSystem : ISystem
 				}
                 else if (team.ValueRO.CurrentTeam == Teams.Right)
 				{
+					ecb.RemoveComponent<OreToTeamRight>(ore);
+
 					ecb.AddComponent(drone.ValueRO.Entity, new DroneToHome
 					{
 						HomePos = homeRight,
 					});
 				}
+
+				ecb.RemoveComponent<DroneToOre>(drone.ValueRO.Entity);
 			}
         }
 
@@ -123,10 +174,17 @@ partial struct DroneMoveSystem : ISystem
 
             if(dist > 3.5f)
             {
+
+				var maxSpeed = drone.ValueRO.MaxSpeed;
+				if (dist < 8)
+				{
+					maxSpeed = 5f;
+				}
+
 				var dir = math.normalize(toHome.ValueRO.HomePos - tran.ValueRO.Position);
 
-				velocity.ValueRW.Linear = math.clamp(velocity.ValueRO.Linear + drone.ValueRO.Speed * SystemAPI.Time.DeltaTime * dir,
-					new float3(-3), new float3(3));
+				velocity.ValueRW.Linear = math.clamp(dir * drone.ValueRO.Speed,
+					-maxSpeed, maxSpeed);
 			}
             else
             {
@@ -138,9 +196,14 @@ partial struct DroneMoveSystem : ISystem
     }
 }
 
-public struct OreToDrone : IComponentData
+public struct OreToTeamLeft : IComponentData
 {
-    public Entity Drone;
+
+}
+
+public struct OreToTeamRight : IComponentData
+{
+
 }
 
 public struct DroneToHome : IComponentData

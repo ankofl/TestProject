@@ -13,7 +13,7 @@ partial struct OreSpawnSystem : ISystem
 
 		state.RequireForUpdate<OreSpawnRequest>();
 
-		state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new OreSpawnRequest { OresCount = 30 });
+		state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new OreSpawnRequest { OresCount = 1000 });
 
 		rnd = new();
 		rnd.InitState();
@@ -31,13 +31,15 @@ partial struct OreSpawnSystem : ISystem
 		var oresCount = SystemAPI.GetComponent<OreSpawnRequest>(requestEntity).OresCount;
 		ecb.DestroyEntity(requestEntity);
 
+		var size = oresCount / 10f;
+
 		NativeList<float3> spawnedPos = new(Allocator.Temp);
 		for (int i = 0, c = 0; i < oresCount && c < oresCount * 10; c++)
 		{
 
-			var pos = rnd.NextFloat3(new(-10, -1f, -10), new(10, -1f, 10));
+			var pos = rnd.NextFloat3(new(-size, -1f, -size), new(size, -1f, size));
 
-			float closest = 10;
+			float closest = size;
 			foreach (var item in spawnedPos)
 			{
 				var curDist = math.distance(item, pos);

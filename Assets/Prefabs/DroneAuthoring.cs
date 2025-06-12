@@ -3,6 +3,7 @@ using UnityEngine;
 
 class DroneAuthoring : MonoBehaviour
 {
+	public float MaxSpeed;
 	public float Speed;
 	class DroneAuthoringBaker : Baker<DroneAuthoring>
 	{
@@ -12,6 +13,7 @@ class DroneAuthoring : MonoBehaviour
 
 			AddComponent(drone, new Drone
 			{
+				MaxSpeed = authoring.MaxSpeed,
 				Speed = authoring.Speed,
 				Entity = drone,
 			});
@@ -21,6 +23,8 @@ class DroneAuthoring : MonoBehaviour
 
 public struct Drone : IComponentData
 {
+	public float MaxSpeed;
+
 	public float Speed;
 	public Entity Entity;
 }

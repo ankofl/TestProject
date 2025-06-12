@@ -18,7 +18,8 @@ class HomeAuthoring : MonoBehaviour
 
 			AddComponent(home, new HomeDronesRequest
 			{
-				DronesCount = authoring.DronesCount,
+				TimeToNextWave = 0,
+				DronesRemainedCount = authoring.DronesCount,
 			});
 		}
 	}
@@ -26,7 +27,9 @@ class HomeAuthoring : MonoBehaviour
 
 public struct HomeDronesRequest : IComponentData
 {
-	public int DronesCount;
+	public float TimeToNextWave;
+
+	public int DronesRemainedCount;
 }
 
 
