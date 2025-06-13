@@ -38,10 +38,14 @@ partial struct DroneToHomeSystem : ISystem
 				{
 					if (SystemAPI.HasComponent<OreInDrone>(child.Value))
 					{
+						var rw = SystemAPI.GetComponentRW<Home>(toHome.ValueRO.Home);
+						rw.ValueRW.OresDelivered += 1;
+
 						if (!SystemAPI.HasComponent<DisableRendering>(child.Value))
 						{
 							ecb.AddComponent(child.Value, new DisableRendering { });
-						}						
+						}
+						break;
 					}
 				}
 

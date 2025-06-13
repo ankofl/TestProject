@@ -23,10 +23,14 @@ partial struct OreSpawnSystem : ISystem
 	{
 		var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
 
-		var prefabs = SystemAPI.GetSingleton<Prefabs>();
-
 		var requestEntity = SystemAPI.GetSingletonEntity<OreSpawnRequest>();
-		var oresCount = SystemAPI.GetComponent<OreSpawnRequest>(requestEntity).OresCount;
+		var requestComp = SystemAPI.GetComponent<OreSpawnRequest>(requestEntity);
+		var oresCount = requestComp.OresCount;
+
+		var prefabs = SystemAPI.GetSingleton<Prefabs>();
+		var rw = SystemAPI.GetComponentRW<Ore>(prefabs.Ore);
+		rw.ValueRW.OreRespawnTime = requestComp.OreRespawnTime;
+
 
 		var size = oresCount / 10f;
 
@@ -73,6 +77,8 @@ partial struct OreSpawnSystem : ISystem
 public struct OreSpawnRequest : IComponentData
 {
 	public int OresCount;
+
+	public float OreRespawnTime;
 }
 
 public struct OreSpawnEnded : IComponentData

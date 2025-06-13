@@ -11,7 +11,7 @@ partial struct DroneSpawnSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<DroneRespawnData>();
+        state.RequireForUpdate<DroneRestartData>();
         state.RequireForUpdate<Home>();
         state.RequireForUpdate<Prefabs>();
         state.RequireForUpdate<OreSpawnEnded>();
@@ -28,13 +28,18 @@ partial struct DroneSpawnSystem : ISystem
 
         var prefabs = SystemAPI.GetSingleton<Prefabs>();
 
-		var restartData = SystemAPI.GetSingleton<DroneRespawnData>();
-		foreach (var home in SystemAPI.Query<RefRO<Home>>().WithNone<HomeDronesRequest, HomeDronesRequestComplete>())
+		var droneRestartData = SystemAPI.GetSingleton<DroneRestartData>();
+
+        var rw = SystemAPI.GetComponentRW<Drone>(prefabs.Drone);
+        rw.ValueRW.Speed = droneRestartData.DronesSpeed;
+
+
+        foreach (var home in SystemAPI.Query<RefRO<Home>>().WithNone<HomeDronesRequest, HomeDronesRequestComplete>())
         {
             ecb.AddComponent(home.ValueRO.Entity, new HomeDronesRequest
             {
                 TimeToNextWave = 0,
-                DronesRemainedCount = restartData.DronesCount,
+                DronesRemainedCount = droneRestartData.DronesCount,
             });
         }
 
@@ -94,7 +99,7 @@ partial struct DroneSpawnSystem : ISystem
                 ecb.RemoveComponent<HomeDronesRequestComplete>(home.ValueRO.Entity);
             }
 
-			ecb.DestroyEntity(SystemAPI.GetSingletonEntity<DroneRespawnData>());
+			ecb.DestroyEntity(SystemAPI.GetSingletonEntity<DroneRestartData>());
 		}
 
 		ecb.Playback(state.EntityManager);

@@ -2,12 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Physics;
-using Unity.Rendering;
 using Unity.Transforms;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Dependencies.Sqlite;
-using UnityEngine;
 
 partial struct DroneOreSelectSystem : ISystem
 {
@@ -124,6 +119,7 @@ public struct OreToTeamRight : IComponentData
 
 public struct DroneToHome : IComponentData
 {
+    public Entity Home;
     public float3 HomePos;
 }
 

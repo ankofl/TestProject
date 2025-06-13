@@ -11,6 +11,7 @@ class OreAuthoring : MonoBehaviour
 
 			AddComponent(ore, new Ore
 			{
+				OreRespawnTime = 30f,
 				Entity = ore,
 			});
 		}
@@ -19,5 +20,6 @@ class OreAuthoring : MonoBehaviour
 
 public struct Ore : IComponentData
 {
+	public float OreRespawnTime;
 	public Entity Entity;
 }

@@ -54,7 +54,6 @@ public class UI : MonoBehaviour
 
 	private void Restart_clicked()
 	{
-		Debug.Log($"Clicked");
 		Clicked = true;
 	}
 }
@@ -68,8 +67,8 @@ public static class UIUtils
 {
 	public static SliderInt Get(this UIDocument ui, string name, int3 value)
 	{
-		var slider = ui.Get<SliderInt>(name);
-		slider.label = name;
+		var slider = ui.Get<SliderInt>(name); 
+
 		slider.lowValue = value.x;
 		slider.highValue = value.y;
 		slider.value = value.z;

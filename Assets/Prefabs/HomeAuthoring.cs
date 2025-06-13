@@ -28,4 +28,6 @@ public struct HomeDronesRequest : IComponentData
 public struct Home : IComponentData
 {
 	public Entity Entity;
+
+	public int OresDelivered;
 }

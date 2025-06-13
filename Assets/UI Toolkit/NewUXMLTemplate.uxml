@@ -1,16 +1,15 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/Styles.uss?fileID=7433441132597879392&amp;guid=5ae0e36f782bb6649bcb0d218b332e79&amp;type=3#Styles" />
     <ui:VisualElement style="flex-grow: 1; flex-direction: row; align-items: flex-end; justify-content: space-between; align-self: stretch;">
-        <ui:VisualElement style="flex-grow: 1;">
-            <ui:SliderInt label="Drones Count" value="42" high-value="100" name="DronesCount" class="GG" />
-            <ui:SliderInt label="Drones Speed" value="42" high-value="100" name="DronesSpeed" class="GG" />
-            <ui:SliderInt label="Ore Respawn Time" value="42" high-value="100" name="OreRespawnTime" class="GG" />
+        <ui:VisualElement style="flex-grow: 1; width: 0.1%; align-items: stretch; align-self: flex-end; justify-content: space-between;">
+            <ui:SliderInt label="Drones Count" value="42" high-value="100" name="DronesCount" show-input-field="true" class="GG" style="width: auto; height: auto; background-color: rgba(0, 0, 0, 0.43);" />
+            <ui:SliderInt label="Drones Speed" value="42" high-value="100" name="DronesSpeed" show-input-field="true" class="GG" />
+            <ui:SliderInt label="Ore Respawn Time" value="42" high-value="100" name="OreRespawnTime" show-input-field="true" class="GG" />
             <ui:Toggle label="Drone Trail" name="DroneTrail" class="GG" />
-            <ui:Label text="Left Team Ores Count:0" name="LeftTeam" class="GG" />
-            <ui:Label text="Right Team Ores Count:0" name="RightTeam" class="GG" />
+            <ui:Label text="Left Team Ores Count: 0" name="LeftTeam" class="GG" />
+            <ui:Label text="Right Team Ores Count: 0" name="RightTeam" class="GG" />
             <ui:Button text="Restart" name="Restart" class="GG" />
         </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 1;" />
         <ui:VisualElement style="flex-grow: 1;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -36,7 +36,7 @@ partial struct DroneToOreSystem : ISystem
 			{
 				if (tran.ValueRO.Position.y < 5)
 				{
-					var deltaY = math.max(0, 5 - tran.ValueRO.Position.y) / 10;
+					var deltaY = math.max(0, 5 - tran.ValueRO.Position.y);
 
 					dir = math.normalize(new float3(dir.x, deltaY, dir.z));
 				}

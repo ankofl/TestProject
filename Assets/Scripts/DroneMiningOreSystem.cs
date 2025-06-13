@@ -30,12 +30,13 @@ partial struct DroneMiningOreSystem : ISystem
 			{
 				if (team.ValueRO.CurrentTeam == Teams.Left)
 				{
-					homes.Left = tran.ValueRO.Position;
+					homes.Left = home.ValueRO.Entity;
 				}
 				else if (team.ValueRO.CurrentTeam == Teams.Right)
 				{
-					homes.Right = tran.ValueRO.Position;
+					homes.Right = home.ValueRO.Entity;
 				}
+
 			}
 
 			state.EntityManager.AddComponentData(entity, homes);
@@ -74,14 +75,16 @@ partial struct DroneMiningOreSystem : ISystem
 				{
 					ecb.AddComponent(drone, new DroneToHome
 					{
-						HomePos = homes.Left,
+						Home = homes.Left,
+						HomePos = SystemAPI.GetComponent<LocalTransform>(homes.Left).Position,
 					});
 				}
 				else if (team.CurrentTeam == Teams.Right)
 				{
 					ecb.AddComponent(drone, new DroneToHome
 					{
-						HomePos = homes.Right,
+						Home = homes.Right,
+						HomePos = SystemAPI.GetComponent<LocalTransform>(homes.Right).Position,
 					});
 				}
 
@@ -89,7 +92,7 @@ partial struct DroneMiningOreSystem : ISystem
 				ecb.RemoveComponent<OreMining>(ore.ValueRO.Entity);
 				ecb.AddComponent(ore.ValueRO.Entity, new OreReload
 				{
-					TimeRemained = 30f,
+					TimeRemained = ore.ValueRO.OreRespawnTime,
 				});
 			}
 		}
@@ -101,7 +104,7 @@ partial struct DroneMiningOreSystem : ISystem
 
 public struct Homes : IComponentData
 {
-	public float3 Left, Right;
+	public Entity Left, Right;
 }
 
 public struct OreMining : IComponentData
