@@ -11,8 +11,10 @@ partial struct DroneSpawnSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate(SystemAPI.QueryBuilder().WithAll<Home>().WithAll<HomeDronesRequest>().Build());
+        state.RequireForUpdate<DroneRespawnData>();
+        state.RequireForUpdate<Home>();
         state.RequireForUpdate<Prefabs>();
+        state.RequireForUpdate<OreSpawnEnded>();
 
         rnd = new();
         rnd.InitState();
@@ -25,6 +27,16 @@ partial struct DroneSpawnSystem : ISystem
         var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
 
         var prefabs = SystemAPI.GetSingleton<Prefabs>();
+
+		var restartData = SystemAPI.GetSingleton<DroneRespawnData>();
+		foreach (var home in SystemAPI.Query<RefRO<Home>>().WithNone<HomeDronesRequest, HomeDronesRequestComplete>())
+        {
+            ecb.AddComponent(home.ValueRO.Entity, new HomeDronesRequest
+            {
+                TimeToNextWave = 0,
+                DronesRemainedCount = restartData.DronesCount,
+            });
+        }
 
         foreach (var (home, team, tran, droneRequest, color) in 
             SystemAPI.Query<RefRW<Home>, RefRO<Team>, RefRO<LocalTransform>, RefRW<HomeDronesRequest>, RefRO<URPMaterialPropertyBaseColor>>())
@@ -42,6 +54,11 @@ partial struct DroneSpawnSystem : ISystem
                 {
                     portion = droneRequest.ValueRO.DronesRemainedCount;
 					ecb.RemoveComponent<HomeDronesRequest>(home.ValueRO.Entity);
+
+                    ecb.AddComponent(home.ValueRO.Entity, new HomeDronesRequestComplete
+                    {
+
+                    });
 				}
                 else
                 {
@@ -63,10 +80,28 @@ partial struct DroneSpawnSystem : ISystem
 					ecb.SetComponent(drone, LocalTransform.FromPosition(droneSpawnPoint));
 					ecb.SetComponent(drone, new Team { CurrentTeam = team.ValueRO.CurrentTeam });
 					ecb.SetComponent(drone, new URPMaterialPropertyBaseColor { Value = color.ValueRO.Value });
+
+
 				}
 			}
         }
 
-        ecb.Playback(state.EntityManager);
+		var homesWithRequestCount = SystemAPI.QueryBuilder().WithAll<Home>().WithAll<HomeDronesRequestComplete>().Build().CalculateEntityCount();
+		if (homesWithRequestCount == 2)
+		{
+            foreach (var home in SystemAPI.Query<RefRO<Home>>().WithAll<HomeDronesRequestComplete>())
+            {
+                ecb.RemoveComponent<HomeDronesRequestComplete>(home.ValueRO.Entity);
+            }
+
+			ecb.DestroyEntity(SystemAPI.GetSingletonEntity<DroneRespawnData>());
+		}
+
+		ecb.Playback(state.EntityManager);
     }
+}
+
+public struct HomeDronesRequestComplete : IComponentData
+{
+
 }

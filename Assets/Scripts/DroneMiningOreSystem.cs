@@ -13,7 +13,6 @@ partial struct DroneMiningOreSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate(SystemAPI.QueryBuilder().WithAll<Ore>().WithAll<OreMining>().Build());
-
 	}
 	
 
@@ -65,35 +64,35 @@ partial struct DroneMiningOreSystem : ISystem
 					if (SystemAPI.HasComponent<OreInDrone>(child.Value))
 					{
 						ecb.RemoveComponent<DisableRendering>(child.Value);
-						}
 					}
+				}
 
 
-					var team = SystemAPI.GetComponent<Team>(drone);
+				var team = SystemAPI.GetComponent<Team>(drone);
 
-					if (team.CurrentTeam == Teams.Left)
+				if (team.CurrentTeam == Teams.Left)
+				{
+					ecb.AddComponent(drone, new DroneToHome
 					{
-						ecb.AddComponent(drone, new DroneToHome
-						{
-							HomePos = homes.Left,
-						});
-					}
-					else if (team.CurrentTeam == Teams.Right)
-					{
-						ecb.AddComponent(drone, new DroneToHome
-						{
-							HomePos = homes.Right,
-						});
-					}
-
-
-					ecb.RemoveComponent<OreMining>(ore.ValueRO.Entity);
-					ecb.AddComponent(ore.ValueRO.Entity, new OreReload
-					{
-						TimeRemained = 30f,
+						HomePos = homes.Left,
 					});
 				}
+				else if (team.CurrentTeam == Teams.Right)
+				{
+					ecb.AddComponent(drone, new DroneToHome
+					{
+						HomePos = homes.Right,
+					});
+				}
+
+
+				ecb.RemoveComponent<OreMining>(ore.ValueRO.Entity);
+				ecb.AddComponent(ore.ValueRO.Entity, new OreReload
+				{
+					TimeRemained = 30f,
+				});
 			}
+		}
 
 		ecb.Playback(state.EntityManager);
     }

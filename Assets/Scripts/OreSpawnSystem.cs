@@ -13,8 +13,6 @@ partial struct OreSpawnSystem : ISystem
 
 		state.RequireForUpdate<OreSpawnRequest>();
 
-		state.EntityManager.AddComponentData(state.EntityManager.CreateEntity(), new OreSpawnRequest { OresCount = 1000 });
-
 		rnd = new();
 		rnd.InitState();
 	}
@@ -29,7 +27,6 @@ partial struct OreSpawnSystem : ISystem
 
 		var requestEntity = SystemAPI.GetSingletonEntity<OreSpawnRequest>();
 		var oresCount = SystemAPI.GetComponent<OreSpawnRequest>(requestEntity).OresCount;
-		ecb.DestroyEntity(requestEntity);
 
 		var size = oresCount / 10f;
 
@@ -62,11 +59,23 @@ partial struct OreSpawnSystem : ISystem
 		}
 
 
+		ecb.RemoveComponent<OreSpawnRequest>(requestEntity);
+		ecb.AddComponent(requestEntity, new OreSpawnEnded
+		{
+
+		});
+
+
 		ecb.Playback(state.EntityManager);
 	}
+}
 
-	public struct OreSpawnRequest : IComponentData
-	{
-		public int OresCount;
-	}
+public struct OreSpawnRequest : IComponentData
+{
+	public int OresCount;
+}
+
+public struct OreSpawnEnded : IComponentData
+{
+
 }

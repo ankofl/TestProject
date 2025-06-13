@@ -1,0 +1,6 @@
+.GG {
+    background-color: rgba(0, 0, 0, 0.43);
+    color: rgb(201, 201, 201);
+    -unity-text-align: upper-center;
+    white-space: normal;
+}
