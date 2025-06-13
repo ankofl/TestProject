@@ -12,10 +12,9 @@ GameObject:
   - component: {fileID: 3364733606724498121}
   - component: {fileID: 3480413927136992674}
   - component: {fileID: 5704649745454581618}
-  - component: {fileID: 7447924817668164208}
-  - component: {fileID: -8472507762908522256}
+  - component: {fileID: -4121690313969042149}
   m_Layer: 0
-  m_Name: Ore
+  m_Name: OreInDrone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,13 +28,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5752599273680897706}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.23911767, y: -0.099045776, z: 0.3696438, w: 0.89239913}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 45}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3364733606724498121
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -102,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 1, g: 0.84974086, b: 0, a: 0}
---- !u!114 &7447924817668164208
+--- !u!114 &-4121690313969042149
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,27 +110,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 5752599273680897706}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b545be35d92058444ac8e65396ae040c, type: 3}
+  m_Script: {fileID: 11500000, guid: 541a285ae523a6545a23065374e8fca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!135 &-8472507762908522256
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5752599273680897706}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}

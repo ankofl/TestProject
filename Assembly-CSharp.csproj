@@ -74,14 +74,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Prefabs\PrefabsAuthoring.cs" />
-    <Compile Include="Assets\Scripts\DroneMoveSystem.cs" />
+    <Compile Include="Assets\Scripts\DroneToOreSystem.cs" />
+    <Compile Include="Assets\Scripts\DroneToHomeSystem.cs" />
+    <Compile Include="Assets\Scripts\DroneOreSelectSystem.cs" />
     <Compile Include="Assets\Prefabs\HomeAuthoring.cs" />
     <Compile Include="Assets\Scripts\DroneMoveDisableSystem.cs" />
+    <Compile Include="Assets\Scripts\DroneMiningOreSystem.cs" />
     <Compile Include="Assets\Prefabs\OreAuthoring.cs" />
+    <Compile Include="Assets\Scripts\DroneRotationSystem.cs" />
     <Compile Include="Assets\Scripts\DroneSpawnSystem.cs" />
     <Compile Include="Assets\Prefabs\DroneAuthoring.cs" />
+    <Compile Include="Assets\Scripts\OreReloadSystem.cs" />
     <Compile Include="Assets\Prefabs\TeamsAuthoring.cs" />
     <Compile Include="Assets\Scripts\OreSpawnSystem.cs" />
+    <Compile Include="Assets\Scripts\DroneToOreReorderSystem.cs" />
+    <Compile Include="Assets\Prefabs\OreInDroneAuthoring.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

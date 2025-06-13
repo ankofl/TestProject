@@ -46,3 +46,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Drone: {fileID: 8812468649069333283, guid: f853f6255b823cd42b5620bcd5c8778a, type: 3}
   Ore: {fileID: 5752599273680897706, guid: 446e94983ad55e74ca4d9ccbbbc32df2, type: 3}
+  OreInDrone: {fileID: 5752599273680897706, guid: 6f889901f3191ee49b4bb54e5cdebe39, type: 3}

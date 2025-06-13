@@ -29,10 +29,13 @@ class TeamsAuthoring : MonoBehaviour
 
 			foreach (var child in GetChildren(true))
 			{
-				if(child.TryGetComponent<URPMaterialPropertyBaseColorAuthoring>(out var childColor))
+				if(!child.TryGetComponent<OreInDroneAuthoring>(out _))
 				{
-					childColor.color = color.color;
-				}
+					if (child.TryGetComponent<URPMaterialPropertyBaseColorAuthoring>(out var childColor))
+					{
+						childColor.color = color.color;
+					}
+				}				
 			}
 
 			var team = GetEntity(authoring, TransformUsageFlags.Dynamic);

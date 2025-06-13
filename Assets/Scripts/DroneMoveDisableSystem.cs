@@ -41,7 +41,7 @@ partial struct DroneMoveDisableSystem : ISystem
 
 				var dist = math.distance(tran.ValueRO.Position, tranOther.ValueRO.Position);
 
-				if(dist < 10f)
+				if(dist < 2f)
 				{
 					if (!SystemAPI.HasComponent<DroneMoveDisable>(droneOther.ValueRO.Entity))
 					{
@@ -63,6 +63,7 @@ partial struct DroneMoveDisableSystem : ISystem
 							color.ValueRW.Value = TeamsColor.To4(TeamsColor.RightInactive);
 						}
 					}
+
 				}
 			}
 		}
